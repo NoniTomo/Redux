@@ -4,10 +4,20 @@ import { IconPencil } from '@tabler/icons-react'
 
 import type { State } from '@/entities/store'
 import { useAppDispatch } from '@/entities/store'
-import type { UpdateUsername } from '@/entities/user/actions'
-import { AvatarButton } from '@/features/user/ui/AvatarButton'
+import { updateUsername } from '@/entities/user/actions'
 import { LogoutButton } from '@/features/user/ui/LogoutButton'
-import { Button, Modal, Popover, PopoverContent, PopoverTrigger } from '@/shared/components'
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Modal,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/shared/components'
+
+const MAX_NAME_LENGTH = 10
 
 export const HeaderMenu = () => {
   const dispatch = useAppDispatch()
@@ -20,7 +30,21 @@ export const HeaderMenu = () => {
     <>
       <Popover open={isOpenMenu}>
         <PopoverTrigger asChild>
-          <AvatarButton onClick={() => setOpenMenu(!isOpenMenu)} name={username} />
+          <Button
+            onClick={() => setOpenMenu(!isOpenMenu)}
+            variant="ghost"
+            className="inline-flex h-12 w-max max-w-60 cursor-pointer items-center justify-between gap-3 hover:bg-lime-500"
+          >
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <span className="text-white">
+              {username.length > MAX_NAME_LENGTH
+                ? username.slice(0, MAX_NAME_LENGTH - 3) + '...'
+                : username}
+            </span>
+          </Button>
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-2">
@@ -44,7 +68,7 @@ export const HeaderMenu = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            dispatch({ type: 'updateUserName', payload: { name } } satisfies UpdateUsername)
+            dispatch(updateUsername({ name }))
             setOpenModal(false)
           }}
         >

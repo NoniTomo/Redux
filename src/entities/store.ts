@@ -5,11 +5,8 @@ import { reducerList } from '@/entities/list/store/reducer'
 import { reducerTodo } from '@/entities/todo/store/reducer'
 import { reducerUser } from '@/entities/user/reducer'
 
-import type { ActionLists } from './list/store/actions'
 import type { StateLists } from './list/store/reducer'
-import type { ActionTodo } from './todo/store/actions'
 import type { StateTodo } from './todo/store/reducer'
-import type { ActionUser } from './user/actions'
 import type { StateUser } from './user/reducer'
 
 export type State = {
@@ -17,8 +14,6 @@ export type State = {
   todos: StateTodo
   user: StateUser
 }
-
-export type Action = ActionLists | ActionTodo | ActionUser
 
 export const reducer = combineReducers({
   lists: reducerList,

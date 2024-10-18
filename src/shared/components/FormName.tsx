@@ -27,11 +27,12 @@ export const FormName = ({
           }}
         >
           <input
+            className="w-full bg-none"
             autoFocus
             name="name"
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            onBlur={(event) => event.target.form?.requestSubmit()}
+            onKeyDown={(event) => event.key === 'Escape' && setEdit(false)}
           />
         </form>
       ) : (

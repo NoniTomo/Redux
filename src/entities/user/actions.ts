@@ -1,17 +1,12 @@
+import { createAction } from '@reduxjs/toolkit'
+
 export type UserId = number
 
 export interface User {
   name: string
 }
 
-export interface UpdateUsername {
-  type: 'updateUserName'
-  payload: {
-    name: string
-  }
-}
-export interface Logout {
-  type: 'logout'
-}
-
-export type ActionUser = UpdateUsername | Logout
+export const updateUsername = createAction<{
+  name: string
+}>('user/updateUserName')
+export const logout = createAction('user/logout')

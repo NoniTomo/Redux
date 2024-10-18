@@ -2,7 +2,8 @@ import { useDispatch } from 'react-redux'
 
 import type { State } from '@/entities/store'
 import { useAppSelector } from '@/entities/store'
-import type { ChangeTodoAction, TodoId } from '@/entities/todo/store/actions'
+import type { TodoId } from '@/entities/todo/store/actions'
+import { changeTodoAction } from '@/entities/todo/store/actions'
 import { selectTodo } from '@/entities/todo/store/selectors'
 
 export interface CheckboxProps {
@@ -19,16 +20,16 @@ export const Checkbox = ({ todoId }: CheckboxProps) => {
       type="checkbox"
       checked={todo.value}
       onChange={(event) => {
-        dispatch({
-          type: 'changeTodo',
-          payload: {
+        dispatch(
+          changeTodoAction({
             todo: {
+              listId: todo.listId,
               value: event.target.checked,
               name: todo.name
             },
             todoId: todo.id
-          }
-        } satisfies ChangeTodoAction)
+          })
+        )
       }}
     />
   )

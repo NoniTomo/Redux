@@ -1,3 +1,5 @@
+import { createAction } from '@reduxjs/toolkit'
+
 export type ListId = number
 
 export interface List {
@@ -5,29 +7,15 @@ export interface List {
   name: string
 }
 
-export interface CreateListAction {
-  type: 'createList'
-  payload: List
-}
-export interface DeleteListAction {
-  type: 'deleteList'
-  payload: {
-    listId: ListId
-  }
-}
-export interface ChangeListAction {
-  type: 'changeList'
-  payload: {
-    listId: ListId
-    name: string
-  }
-}
-export interface StoredListAction {
-  type: 'storedList'
-  payload: {
-    entities: Record<ListId, List>
-    ids: ListId[]
-  }
-}
-
-export type ActionLists = CreateListAction | DeleteListAction | ChangeListAction | StoredListAction
+export const createListAction = createAction<List>('lists/createList')
+export const deleteListAction = createAction<{
+  listId: ListId
+}>('lists/deleteList')
+export const changeListAction = createAction<{
+  listId: ListId
+  name: string
+}>('lists/changeList')
+export const storedListAction = createAction<{
+  entities: Record<ListId, List>
+  ids: ListId[]
+}>('lists/storedList')

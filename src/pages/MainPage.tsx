@@ -1,8 +1,8 @@
 import { Link, Outlet } from 'react-router-dom'
 
 import { Lists } from '@/features/list/ui/Lists.tsx'
-import { HeaderMenu } from '@/features/user/ui/HeaderMenu'
 import { Layout } from '@/shared/components/Layout/Layout.tsx'
+import { HeaderMenu } from '@/widgets/user/ui/HeaderMenu'
 
 export const MainPage = () => {
   return (

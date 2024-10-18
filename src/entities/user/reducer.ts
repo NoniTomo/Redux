@@ -1,26 +1,24 @@
-import { initialState } from '@/entities/initialState'
-import type { Action } from '@/entities/store'
+import { createReducer } from '@reduxjs/toolkit'
 
-import type { User } from './actions'
+import { initialState } from '@/entities/initialState'
+
+import { logout, updateUsername, type User } from './actions'
 
 export type StateUser = User
 
-export const reducerUser = (state: StateUser = initialState.user, action: Action) => {
-  switch (action.type) {
-    case 'updateUserName': {
-      return {
-        ...state,
-        name: action.payload.name
-      }
+export const reducerUser = createReducer(initialState.user, (builder) => {
+  builder.addCase(updateUsername, (state, action) => {
+    if (!state.name) {
+      state.name = initialState.user.name
     }
-    case 'logout': {
-      return {
-        ...state,
-        name: null
-      }
+
+    state.name = action.payload.name
+  })
+  builder.addCase(logout, (state) => {
+    if (!state.name) {
+      state.name = initialState.user.name
     }
-    default: {
-      return state
-    }
-  }
-}
+
+    state.name = undefined!
+  })
+})

@@ -1,9 +1,9 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import type { State } from '@/entities/store'
-import type { ChangeTodoAction, DeleteTodoAction, TodoId } from '@/entities/todo/store/actions'
+import type { TodoId } from '@/entities/todo/store/actions'
+import { changeTodoAction, deleteTodoAction } from '@/entities/todo/store/actions'
 import { selectTodo } from '@/entities/todo/store/selectors'
 import { FormName } from '@/shared/components/FormName'
 import { Menu } from '@/shared/components/Menu'
@@ -15,7 +15,6 @@ export interface TodoProps {
 }
 
 export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
-  const { id } = useParams()
   const dispatch = useDispatch()
   const todo = useSelector((state: State) => selectTodo(state, todoId))
 
@@ -29,42 +28,41 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
           isEdit={isEdit}
           setEdit={setEdit}
           dispatch={(name: string) =>
-            dispatch({
-              type: 'changeTodo',
-              payload: {
+            dispatch(
+              changeTodoAction({
                 todo: {
+                  listId: todo.listId,
                   value: todo.value,
                   name
                 },
                 todoId: todo.id
-              }
-            } satisfies ChangeTodoAction)
+              })
+            )
           }
           defaultName={todo.name}
           onClick={() => {
-            dispatch({
-              type: 'changeTodo',
-              payload: {
+            dispatch(
+              changeTodoAction({
                 todo: {
+                  listId: todo.listId,
                   value: !todo.value,
                   name: todo.name
                 },
                 todoId: todo.id
-              }
-            } satisfies ChangeTodoAction)
+              })
+            )
           }}
         />
       </div>
       <Menu
         editFunction={() => setEdit(true)}
         deleteFunction={() =>
-          dispatch({
-            type: 'deleteTodo',
-            payload: {
+          dispatch(
+            deleteTodoAction({
               todoId: todoId,
-              listId: Number(id)
-            }
-          } satisfies DeleteTodoAction)
+              listId: todo.listId
+            })
+          )
         }
       />
     </div>
