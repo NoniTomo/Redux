@@ -11,7 +11,8 @@
     "prepare": "husky",
     "style": "stylelint \"**/*.{scss, css}\"",
     "pretty": "yarn format && yarn lint --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,js,html}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,html}\"",
+    "mock": "npx mock-config-server"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.1",
