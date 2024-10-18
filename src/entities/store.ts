@@ -1,13 +1,12 @@
 import { useDispatch, useSelector, useStore } from 'react-redux'
-import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 
-import { reducerList } from '@/entities/list/store/reducer'
-import { reducerTodo } from '@/entities/todo/store/reducer'
-import { reducerUser } from '@/entities/user/reducer'
-
-import type { StateLists } from './list/store/reducer'
-import type { StateTodo } from './todo/store/reducer'
-import type { StateUser } from './user/reducer'
+import type { StateLists } from './list/list.slice'
+import { listsSlice } from './list/list.slice'
+import type { StateTodo } from './todo/todo.slice'
+import { todosSlice } from './todo/todo.slice'
+import type { StateUser } from './user/user.slice'
+import { userSlice } from './user/user.slice'
 
 export type State = {
   lists: StateLists
@@ -15,14 +14,12 @@ export type State = {
   user: StateUser
 }
 
-export const reducer = combineReducers({
-  lists: reducerList,
-  todos: reducerTodo,
-  user: reducerUser
-})
-
 export const store = configureStore({
-  reducer: reducer
+  reducer: {
+    [userSlice.name]: userSlice.reducer,
+    [listsSlice.name]: listsSlice.reducer,
+    [todosSlice.name]: todosSlice.reducer
+  }
 })
 
 export type AppState = ReturnType<typeof store.getState>

@@ -4,7 +4,7 @@ import { IconPencil } from '@tabler/icons-react'
 
 import type { State } from '@/entities/store'
 import { useAppDispatch } from '@/entities/store'
-import { updateUsername } from '@/entities/user/actions'
+import { userSlice } from '@/entities/user/user.slice'
 import { LogoutButton } from '@/features/user/ui/LogoutButton'
 import {
   Avatar,
@@ -68,7 +68,7 @@ export const HeaderMenu = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            dispatch(updateUsername({ name }))
+            dispatch(userSlice.actions.updateUsername({ name }))
             setOpenModal(false)
           }}
         >

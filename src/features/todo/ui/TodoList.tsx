@@ -1,9 +1,7 @@
 import { useParams } from 'react-router-dom'
 
-import type { State } from '@/entities/store'
 import { useAppDispatch, useAppSelector } from '@/entities/store'
-import type { TodoId } from '@/entities/todo/store/actions'
-import { createTodoAction } from '@/entities/todo/store/actions'
+import { todosSlice } from '@/entities/todo/todo.slice'
 import { AddButton } from '@/shared/components'
 
 import { TodoComponent } from './Todo'
@@ -12,14 +10,14 @@ export const TodoList = () => {
   const { id } = useParams()
   const dispatch = useAppDispatch()
 
-  const todosIds = useAppSelector((state: State) => state.todos.idsByList[Number(id)])
+  const todosIds = useAppSelector((state) => todosSlice.selectors.selectTodosIds(state, Number(id)))
 
   return (
     <div className="flex w-full flex-col items-start">
       <AddButton
         dispatch={(name) =>
           dispatch(
-            createTodoAction({
+            todosSlice.actions.createTodo({
               listId: Number(id),
               todo: {
                 listId: Number(id),
@@ -32,7 +30,7 @@ export const TodoList = () => {
         }
       />
       {todosIds?.length ? (
-        todosIds.map((todoId: TodoId) => <TodoComponent todoId={todoId} key={todoId} />)
+        todosIds.map((todoId) => <TodoComponent todoId={todoId} key={todoId} />)
       ) : (
         <p>Empty...</p>
       )}

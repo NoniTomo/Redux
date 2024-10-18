@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 
-import type { ListId } from '@/entities/list/store/actions'
-import { createListAction } from '@/entities/list/store/actions'
+import type { ListId } from '@/entities/list/list.slice'
+import { listsSlice } from '@/entities/list/list.slice'
 import { useAppSelector } from '@/entities/store'
 import { AddButton } from '@/shared/components'
 
@@ -16,7 +16,7 @@ export const Lists = () => {
       <AddButton
         dispatch={(name: string) =>
           dispatch(
-            createListAction({
+            listsSlice.actions.createList({
               id: 1,
               name: name
             })

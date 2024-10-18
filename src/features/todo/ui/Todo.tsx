@@ -2,9 +2,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import type { State } from '@/entities/store'
-import type { TodoId } from '@/entities/todo/store/actions'
-import { changeTodoAction, deleteTodoAction } from '@/entities/todo/store/actions'
-import { selectTodo } from '@/entities/todo/store/selectors'
+import type { TodoId } from '@/entities/todo/todo.slice'
+import { todosSlice } from '@/entities/todo/todo.slice'
 import { FormName } from '@/shared/components/FormName'
 import { Menu } from '@/shared/components/Menu'
 
@@ -16,7 +15,7 @@ export interface TodoProps {
 
 export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
   const dispatch = useDispatch()
-  const todo = useSelector((state: State) => selectTodo(state, todoId))
+  const todo = useSelector((state: State) => todosSlice.selectors.selectTodo(state, todoId))
 
   const [isEdit, setEdit] = React.useState(false)
 
@@ -29,7 +28,7 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
           setEdit={setEdit}
           dispatch={(name: string) =>
             dispatch(
-              changeTodoAction({
+              todosSlice.actions.changeTodo({
                 todo: {
                   listId: todo.listId,
                   value: todo.value,
@@ -42,7 +41,7 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
           defaultName={todo.name}
           onClick={() => {
             dispatch(
-              changeTodoAction({
+              todosSlice.actions.changeTodo({
                 todo: {
                   listId: todo.listId,
                   value: !todo.value,
@@ -58,7 +57,7 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
         editFunction={() => setEdit(true)}
         deleteFunction={() =>
           dispatch(
-            deleteTodoAction({
+            todosSlice.actions.deleteTodo({
               todoId: todoId,
               listId: todo.listId
             })
