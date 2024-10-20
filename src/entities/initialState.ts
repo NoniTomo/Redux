@@ -9,7 +9,8 @@ export const initialState: State = {
       4: { id: 4, name: 'Study Plan' },
       5: { id: 5, name: 'Fitness Goals' }
     },
-    ids: [1, 2, 3, 4, 5]
+    ids: [1, 2, 3, 4, 5],
+    fetchListsStatus: 'idle'
   },
   todos: {
     entities: {
@@ -49,9 +50,11 @@ export const initialState: State = {
       3: [11, 12, 13, 14, 15],
       4: [16, 17, 18, 19, 20],
       5: [21, 22, 23, 24, 25]
-    }
+    },
+    fetchTodosStatus: 'idle'
   },
   user: {
-    name: 'name'
+    user: { name: 'name' },
+    fetchUsersStatus: 'idle'
   }
 }

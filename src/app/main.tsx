@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { getListsRequest } from '@/entities/list/model/getLists'
 import { store } from '@/entities/store.ts'
 import { TodoList } from '@/features/todo/ui/TodoList'
 import { MainPage } from '@/pages/MainPage.tsx'
@@ -21,6 +22,8 @@ const router = createBrowserRouter([
     ]
   }
 ])
+
+store.dispatch(getListsRequest)
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

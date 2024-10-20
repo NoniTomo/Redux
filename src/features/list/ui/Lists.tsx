@@ -1,15 +1,24 @@
-import { useDispatch } from 'react-redux'
+import React from 'react'
 
 import type { ListId } from '@/entities/list/list.slice'
 import { listsSlice } from '@/entities/list/list.slice'
-import { useAppSelector } from '@/entities/store'
+import { getListsRequest } from '@/entities/list/model/getLists'
+import { useAppDispatch, useAppSelector, useAppStore } from '@/entities/store'
 import { AddButton } from '@/shared/components'
 
 import { ListComponent } from './ListComponent'
 
 export const Lists = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
+  const appStore = useAppStore()
   const listsIds = useAppSelector((state) => state.lists.ids)
+  const selectIsFetchListsPending = useAppSelector(listsSlice.selectors.selectIsFetchListsPending)
+
+  React.useEffect(() => {
+    dispatch(getListsRequest)
+  }, [dispatch, appStore])
+
+  if (selectIsFetchListsPending) return <p>Loading...</p>
 
   return (
     <>

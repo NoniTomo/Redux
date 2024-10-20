@@ -1,7 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit'
 
-import { initialState } from '../initialState'
+//import { initialState } from '../initialState'
 
 export type ListId = number
 
@@ -10,15 +10,28 @@ export interface List {
   name: string
 }
 
+const initialState: StateLists = {
+  entities: {},
+  ids: [],
+  fetchListsStatus: 'idle'
+}
+
 export interface StateLists {
   entities: Record<ListId, List>
   ids: ListId[]
+  fetchListsStatus: 'idle' | 'pending' | 'success' | 'failed'
 }
+
 export const listsSlice = createSlice({
   name: 'lists',
-  initialState: initialState.lists,
+  initialState: initialState,
+  selectors: {
+    selectIsFetchListsPending: (state) => state.fetchListsStatus === 'pending',
+    selectIsFetchListsIdle: (state) => state.fetchListsStatus === 'idle'
+  },
   reducers: {
     createList: (state, action: PayloadAction<List>) => ({
+      ...state,
       entities: { ...state.entities, [action.payload.id]: action.payload },
       ids: [action.payload.id, ...state.ids]
     }),
@@ -33,6 +46,7 @@ export const listsSlice = createSlice({
       delete entities[listId]
 
       return {
+        ...state,
         entities: entities,
         ids: state.ids.filter((id: ListId) => id !== listId)
       }
@@ -54,15 +68,31 @@ export const listsSlice = createSlice({
         }
       }
     },
-    storedList: (
-      _,
+    fetchListsPending: (state) => {
+      state.fetchListsStatus = 'pending'
+    },
+    fetchListsFailed: (state) => {
+      state.fetchListsStatus = 'failed'
+    },
+    fetchListsSuccess: (
+      state,
       action: PayloadAction<{
         entities: Record<ListId, List>
         ids: ListId[]
       }>
-    ) => ({
-      entities: action.payload.entities,
-      ids: action.payload.ids
-    })
+    ) => {
+      console.log({
+        ...state,
+        fetchListsStatus: 'success',
+        entities: action.payload.entities,
+        ids: action.payload.ids
+      })
+      return {
+        ...state,
+        fetchListsStatus: 'success',
+        entities: action.payload.entities,
+        ids: action.payload.ids
+      }
+    }
   }
 })

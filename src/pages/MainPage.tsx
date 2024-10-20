@@ -16,6 +16,10 @@ export const MainPage = () => {
       <Layout.Body>
         <Layout.Navbar>
           <Lists />
+          <Lists />
+          <Lists />
+          <Lists />
+          <Lists />
         </Layout.Navbar>
         <Layout.Content>
           <Outlet />

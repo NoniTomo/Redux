@@ -2,7 +2,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { IconPencil } from '@tabler/icons-react'
 
-import type { State } from '@/entities/store'
 import { useAppDispatch } from '@/entities/store'
 import { userSlice } from '@/entities/user/user.slice'
 import { LogoutButton } from '@/features/user/ui/LogoutButton'
@@ -21,7 +20,7 @@ const MAX_NAME_LENGTH = 10
 
 export const HeaderMenu = () => {
   const dispatch = useAppDispatch()
-  const username = useSelector((state: State) => state.user.name)
+  const username = useSelector(userSlice.selectors.selectUserName)
   const [isOpenMenu, setOpenMenu] = React.useState(false)
   const [isOpenModal, setOpenModal] = React.useState(false)
   const [name, setName] = React.useState(username)

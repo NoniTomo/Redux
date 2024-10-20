@@ -16,6 +16,7 @@ export interface Todo {
 export interface StateTodo {
   entities: Record<TodoId, Todo>
   idsByList: Record<ListId, TodoId[]>
+  fetchTodosStatus: 'idle' | 'pending' | 'success' | 'failed'
 }
 
 export const todosSlice = createSlice({
@@ -28,7 +29,9 @@ export const todosSlice = createSlice({
       (todoIds, entities) => todoIds.map((id: number) => entities[id])
     ),
     selectTodo: (state, todoId: TodoId) => state.entities[todoId],
-    selectTodosIds: (state, listId) => state.idsByList[listId]
+    selectTodosIds: (state, listId) => state.idsByList[listId],
+    selectIsFetchTodosPending: (state) => state.fetchTodosStatus === 'pending',
+    selectIsFetchTodosIdle: (state) => state.fetchTodosStatus === 'idle'
   },
   reducers: {
     createTodo: (
@@ -38,6 +41,7 @@ export const todosSlice = createSlice({
         listId: ListId
       }>
     ) => ({
+      ...state,
       entities: { ...state.entities, [action.payload.todo.id]: action.payload.todo },
       idsByList: {
         ...state.idsByList,
@@ -56,6 +60,7 @@ export const todosSlice = createSlice({
       delete entities[todoId]
 
       return {
+        ...state,
         entities: entities,
         idsByList: {
           ...state.idsByList,
@@ -79,13 +84,21 @@ export const todosSlice = createSlice({
         }
       }
     },
-    storedTodo: (
-      _,
+    fetchTodosPending: (state) => {
+      state.fetchTodosStatus = 'pending'
+    },
+    fetchTodosFailed: (state) => {
+      state.fetchTodosStatus = 'failed'
+    },
+    fetchTodosSuccess: (
+      state,
       action: PayloadAction<{
         entities: Record<TodoId, Todo>
         idsByList: Record<ListId, TodoId[]>
       }>
     ) => ({
+      ...state,
+      fetchTodosStatus: 'success',
       entities: action.payload.entities,
       idsByList: action.payload.idsByList
     })
@@ -107,6 +120,7 @@ export const todosSlice = createSlice({
         delete idsByList[action.payload.listId]
 
         return {
+          ...state,
           entities: entities,
           idsByList: idsByList
         }

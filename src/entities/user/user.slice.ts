@@ -9,11 +9,19 @@ export interface User {
   name: string
 }
 
-export type StateUser = User
+export type StateUser = {
+  user: User
+  fetchUsersStatus: 'idle' | 'pending' | 'success' | 'failed'
+}
 
 export const userSlice = createSlice({
   name: 'user',
   initialState: initialState.user,
+  selectors: {
+    selectUserName: (state) => state.user?.name,
+    selectIsFetchUsersPending: (state) => state.fetchUsersStatus === 'pending',
+    selectIsFetchUsersIdle: (state) => state.fetchUsersStatus === 'idle'
+  },
   reducers: {
     updateUsername: (
       state,
@@ -21,18 +29,28 @@ export const userSlice = createSlice({
         name: string
       }>
     ) => {
-      if (!state.name) {
-        state.name = initialState.user.name
+      if (!state.user?.name) {
+        state.user.name = initialState.user.user?.name
       }
 
-      state.name = action.payload.name
+      state.user.name = action.payload.name
     },
     logout: (state) => {
-      if (!state.name) {
-        state.name = initialState.user.name
+      if (!state.user?.name) {
+        state.user.name = initialState.user.user?.name
       }
 
-      state.name = undefined!
+      state.user.name = undefined!
+    },
+    fetchUserPending: (state) => {
+      state.fetchUsersStatus = 'pending'
+    },
+    fetchUserFailed: (state) => {
+      state.fetchUsersStatus = 'failed'
+    },
+    fetchUserSuccess: (state, action: PayloadAction<User>) => {
+      state.fetchUsersStatus = 'success'
+      state.user.name = action.payload.name
     }
   }
 })
