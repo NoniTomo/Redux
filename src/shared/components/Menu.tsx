@@ -6,10 +6,19 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 type MenuProps = {
   deleteFunction: () => void
   editFunction: () => void
+  isDeletePending?: boolean
+  isChangePending?: boolean
   className?: string
 }
 
-export const Menu = ({ deleteFunction, editFunction, className, ...props }: MenuProps) => (
+export const Menu = ({
+  deleteFunction,
+  editFunction,
+  className,
+  isDeletePending = false,
+  isChangePending = false,
+  ...props
+}: MenuProps) => (
   <Popover>
     <PopoverTrigger asChild>
       <Button variant="ghost" className={className} {...props}>
@@ -17,10 +26,10 @@ export const Menu = ({ deleteFunction, editFunction, className, ...props }: Menu
       </Button>
     </PopoverTrigger>
     <PopoverContent className="flex-column">
-      <Button variant="ghost" onClick={editFunction} className="p-2">
+      <Button variant="ghost" onClick={editFunction} disabled={isChangePending} className="p-2">
         <IconPencil className="size-5" />
       </Button>
-      <Button variant="destructive" onClick={deleteFunction} className="p-2">
+      <Button variant="destructive" onClick={deleteFunction} disabled={isDeletePending} className="p-2">
         <IconTrash className="size-5" />
       </Button>
     </PopoverContent>

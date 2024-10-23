@@ -6,10 +6,12 @@ export const postListsIdTodosConfig: RestRequestConfig = {
   routes: [
     {
       data: (request) => ({
-        listId: Number(request.params.listId),
-        name: request.body.name,
-        id: Date.now(),
-        value: false
+        todo: {
+          listId: Number(request.params.listId),
+          name: request.body.name,
+          id: Date.now(),
+          value: false
+        }
       }),
       entities: {
         body: {

@@ -1,19 +1,19 @@
-import type { AppThunk } from '@/entities/store'
+import type { GetListsRequestConfig } from '@/shared/api/requests'
+import { createAppAsyncThunk } from '@/shared/lib/store'
 
-import { listsSlice } from '../list.slice'
+import type { List, ListId } from '../list.slice'
 
-export const getListsRequest =
-  (): AppThunk =>
-  (dispatch, getState, { api }) => {
-    const isIdle = listsSlice.selectors.selectIsFetchListsIdle(getState())
-    if (!isIdle) return
-    dispatch(listsSlice.actions.fetchListsPending())
-    api
-      .getLists()
-      .then((lists) => {
-        dispatch(listsSlice.actions.fetchListsSuccess(lists))
-      })
-      .catch(() => {
-        dispatch(listsSlice.actions.fetchListsFailed())
-      })
-  }
+export const getListsRequest = createAppAsyncThunk(
+  'lists/getListsRequest',
+  async (params: GetListsRequestConfig, thunkApi) =>
+    thunkApi.extra.api.getLists(params).then((res) => ({
+      entities: res.data.items.reduce(
+        (entities, list) => {
+          entities[list.id] = list
+          return entities
+        },
+        {} as Record<ListId, List>
+      ),
+      ids: res.data.items.map((list) => list.id)
+    }))
+)

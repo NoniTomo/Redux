@@ -1,4 +1,4 @@
-import type { State } from './store'
+import type { State } from '../shared/lib/store'
 
 export const initialState: State = {
   lists: {

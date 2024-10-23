@@ -5,7 +5,7 @@ export const deleteListsIdConfig: RestRequestConfig = {
   method: 'delete',
   routes: [
     {
-      data: {},
+      data: null,
       entities: {
         params: {
           listId: {

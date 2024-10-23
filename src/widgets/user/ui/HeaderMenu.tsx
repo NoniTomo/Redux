@@ -2,7 +2,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { IconPencil } from '@tabler/icons-react'
 
-import { useAppDispatch } from '@/entities/store'
 import { userSlice } from '@/entities/user/user.slice'
 import { LogoutButton } from '@/features/user/ui/LogoutButton'
 import {
@@ -15,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/shared/components'
+import { useAppDispatch } from '@/shared/lib/store'
 
 const MAX_NAME_LENGTH = 10
 

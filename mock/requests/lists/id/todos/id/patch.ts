@@ -1,11 +1,13 @@
 import type { RestRequestConfig } from 'mock-config-server'
 
 export const patchListsIdTodosIdConfig: RestRequestConfig = {
-  path: '/lists/:listId/todos',
+  path: '/lists/:listId/todos/:todoId',
   method: 'patch',
   routes: [
     {
-      data: (request) => request.body,
+      data: (request) => ({
+        todo: request.body.todo
+      }),
       entities: {
         params: {
           listId: {

@@ -19,5 +19,9 @@ export type PatchListsIdTodosIdRequestConfig = RequestConfig<
   PatchListsIdTodosIdRequestParams & PatchListsIdTodosIdRequest
 >
 
-export const patchListsIdTodosIdConfig = async ({ params, config }: PatchListsIdTodosIdRequestConfig) =>
-  instance.patch<PatchListsIdTodosIdResponse>(`/lists/${params.listId}/todos/${params.todoId}`, config)
+export const patchListsIdTodosId = async ({ params, config }: PatchListsIdTodosIdRequestConfig) =>
+  instance.patch<PatchListsIdTodosIdResponse>(
+    `/lists/${params.listId}/todos/${params.todoId}`,
+    params,
+    config
+  )

@@ -9,8 +9,5 @@ export type DeleteListsIdTodosIdRequestParams = {
 
 export type DeleteListsIdTodosIdRequestConfig = RequestConfig<DeleteListsIdTodosIdRequestParams>
 
-export const deleteListsIdTodosIdConfig = async ({
-  params,
-  config
-}: DeleteListsIdTodosIdRequestConfig) =>
+export const deleteListsIdTodosId = async ({ params, config }: DeleteListsIdTodosIdRequestConfig) =>
   instance.delete(`/lists/${params.listId}/todos/${params.todoId}`, config)

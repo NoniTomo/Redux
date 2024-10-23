@@ -1,7 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { createSlice } from '@reduxjs/toolkit'
 
 import { initialState } from '@/entities/initialState'
+import { createSlice } from '@/shared/lib/store'
 
 export type UserId = number
 

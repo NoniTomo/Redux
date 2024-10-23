@@ -1,23 +1,14 @@
-import React from 'react'
-
 import type { ListId } from '@/entities/list/list.slice'
 import { listsSlice } from '@/entities/list/list.slice'
-import { getListsRequest } from '@/entities/list/model/getLists'
-import { useAppDispatch, useAppSelector, useAppStore } from '@/entities/store'
 import { AddButton } from '@/shared/components'
+import { useAppDispatch, useAppSelector } from '@/shared/lib/store'
 
 import { ListComponent } from './ListComponent'
 
 export const Lists = () => {
   const dispatch = useAppDispatch()
-  const appStore = useAppStore()
-  const listsIds = useAppSelector((state) => state.lists.ids)
   const selectIsFetchListsPending = useAppSelector(listsSlice.selectors.selectIsFetchListsPending)
-
-  React.useEffect(() => {
-    dispatch(getListsRequest)
-  }, [dispatch, appStore])
-
+  const listsIds = useAppSelector(listsSlice.selectors.selectIsListsIds)
   if (selectIsFetchListsPending) return <p>Loading...</p>
 
   return (

@@ -18,5 +18,5 @@ export type PostListsIdTodosRequestConfig = RequestConfig<
   PostListsIdTodosRequestParams & PostListsIdTodosRequest
 >
 
-export const postListsIdTodosConfig = async ({ params, config }: PostListsIdTodosRequestConfig) =>
-  instance.post<PostListsIdTodosResponse>(`/lists/${params.listId}/todos`, config)
+export const postListsIdTodos = async ({ params, config }: PostListsIdTodosRequestConfig) =>
+  instance.post<PostListsIdTodosResponse>(`/lists/${params.listId}/todos`, params, config)

@@ -1,7 +1,8 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { createSlice } from '@reduxjs/toolkit'
 
-//import { initialState } from '../initialState'
+import { createSlice } from '@/shared/lib/store'
+
+import { getListsRequest } from './model/getLists'
 
 export type ListId = number
 
@@ -27,7 +28,8 @@ export const listsSlice = createSlice({
   initialState: initialState,
   selectors: {
     selectIsFetchListsPending: (state) => state.fetchListsStatus === 'pending',
-    selectIsFetchListsIdle: (state) => state.fetchListsStatus === 'idle'
+    selectIsFetchListsIdle: (state) => state.fetchListsStatus === 'idle',
+    selectIsListsIds: (state) => state.ids
   },
   reducers: {
     createList: (state, action: PayloadAction<List>) => ({
@@ -67,32 +69,29 @@ export const listsSlice = createSlice({
           [listId]: { ...state.entities[listId], name }
         }
       }
-    },
-    fetchListsPending: (state) => {
+    }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getListsRequest.pending, (state) => {
       state.fetchListsStatus = 'pending'
-    },
-    fetchListsFailed: (state) => {
+    })
+    builder.addCase(getListsRequest.rejected, (state) => {
       state.fetchListsStatus = 'failed'
-    },
-    fetchListsSuccess: (
-      state,
-      action: PayloadAction<{
-        entities: Record<ListId, List>
-        ids: ListId[]
-      }>
-    ) => {
-      console.log({
+    })
+    builder.addCase(
+      getListsRequest.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          entities: Record<ListId, List>
+          ids: ListId[]
+        }>
+      ) => ({
         ...state,
         fetchListsStatus: 'success',
         entities: action.payload.entities,
         ids: action.payload.ids
       })
-      return {
-        ...state,
-        fetchListsStatus: 'success',
-        entities: action.payload.entities,
-        ids: action.payload.ids
-      }
-    }
+    )
   }
 })

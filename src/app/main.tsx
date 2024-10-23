@@ -1,27 +1,14 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 
+import { store } from '@/app/store'
 import { getListsRequest } from '@/entities/list/model/getLists'
-import { store } from '@/entities/store.ts'
-import { TodoList } from '@/features/todo/ui/TodoList'
-import { MainPage } from '@/pages/MainPage.tsx'
+
+import { router } from './router'
 
 import './index.css'
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <MainPage />,
-    children: [
-      {
-        path: '/list/:id',
-        element: <TodoList />
-      }
-    ]
-  }
-])
 
 store.dispatch(getListsRequest)
 

@@ -2,7 +2,7 @@ import { DATABASE } from 'mock/database'
 import type { RestRequestConfig } from 'mock-config-server'
 
 export const getListsIdTodosConfig: RestRequestConfig = {
-  path: '/lists/:id/todos',
+  path: '/lists/:listId/todos',
   method: 'get',
   routes: [
     {

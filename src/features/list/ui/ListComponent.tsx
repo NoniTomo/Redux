@@ -4,8 +4,8 @@ import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
 
 import { type ListId, listsSlice } from '@/entities/list/list.slice'
-import { useAppSelector } from '@/entities/store'
 import { FormName, Menu } from '@/shared/components'
+import { useAppSelector } from '@/shared/lib/store'
 
 export interface ListComponentProps {
   listId: ListId
@@ -45,21 +45,28 @@ export const ListComponent = ({ listId }: ListComponentProps) => {
               defaultName={entities[listId].name}
             />
           </div>
-          <Menu
-            className={clsx(
-              'h-min p-1 hover:bg-gray-300',
-              isActive && 'h-min p-1 hover:bg-lime-500',
-              isPending && 'h-min p-1 hover:bg-gray-300'
-            )}
-            editFunction={() => setEdit(true)}
-            deleteFunction={() =>
-              dispatch(
-                listsSlice.actions.deleteList({
-                  listId: listId
-                })
-              )
-            }
-          />
+          <div
+            onClick={(event) => {
+              event.stopPropagation()
+              event.preventDefault()
+            }}
+          >
+            <Menu
+              className={clsx(
+                'h-min p-1 hover:bg-gray-300',
+                isActive && 'h-min p-1 hover:bg-lime-500',
+                isPending && 'h-min p-1 hover:bg-gray-300'
+              )}
+              editFunction={() => setEdit(true)}
+              deleteFunction={() =>
+                dispatch(
+                  listsSlice.actions.deleteList({
+                    listId: listId
+                  })
+                )
+              }
+            />
+          </div>
         </>
       )}
     </NavLink>

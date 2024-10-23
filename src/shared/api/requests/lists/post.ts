@@ -1,6 +1,5 @@
 import type { ListId } from '@/entities/list/list.slice'
-
-import { instance } from '../../index'
+import { instance } from '@/shared/api'
 
 export type CreateListResponse = {
   id: ListId
