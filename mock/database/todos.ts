@@ -1,4 +1,6 @@
-export const TODOS = {
+import type { Todo } from '@/entities/todo/todo.slice'
+
+export const TODOS: { items: Todo[] } = {
   items: [
     { listId: 1, id: 1, name: 'Buy milk', value: false },
     { listId: 1, id: 2, name: 'Buy bread', value: false },

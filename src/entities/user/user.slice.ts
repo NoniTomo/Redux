@@ -1,7 +1,10 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 
-import { initialState } from '@/entities/initialState'
-import { createSlice } from '@/shared/lib/store'
+import { createAppSlice } from '@/shared/lib/store'
+
+import { getUserRequest } from './model/getUser'
+import { logoutUserRequest } from './model/logoutUser'
+import { patchUserRequest } from './model/patchUser'
 
 export type UserId = number
 
@@ -10,47 +13,63 @@ export interface User {
 }
 
 export type StateUser = {
-  user: User
-  fetchUsersStatus: 'idle' | 'pending' | 'success' | 'failed'
+  user: User | undefined
+  fetchUserStatus: 'idle' | 'pending' | 'success' | 'failed'
+  patchUserStatus: 'idle' | 'pending' | 'success' | 'failed'
+  logoutStatus: 'idle' | 'pending' | 'success' | 'failed'
 }
 
-export const userSlice = createSlice({
+const initialState: StateUser = {
+  user: undefined!,
+  fetchUserStatus: 'idle',
+  patchUserStatus: 'idle',
+  logoutStatus: 'idle'
+}
+
+export const userSlice = createAppSlice({
   name: 'user',
-  initialState: initialState.user,
+  initialState: initialState,
   selectors: {
-    selectUserName: (state) => state.user?.name,
-    selectIsFetchUsersPending: (state) => state.fetchUsersStatus === 'pending',
-    selectIsFetchUsersIdle: (state) => state.fetchUsersStatus === 'idle'
+    selectUser: (state) => state.user,
+    selectIsFetchUsersPending: (state) => state.fetchUserStatus === 'pending',
+    selectIsFetchUsersIdle: (state) => state.fetchUserStatus === 'idle'
   },
-  reducers: {
-    updateUsername: (
-      state,
-      action: PayloadAction<{
-        name: string
-      }>
-    ) => {
+  reducers: {},
+  extraReducers: (create) => {
+    create.addCase(getUserRequest.fulfilled, (state, action: PayloadAction<User>) => {
+      state.fetchUserStatus = 'success'
+
+      state.user = action.payload
+    })
+    create.addCase(patchUserRequest.fulfilled, (state, action: PayloadAction<User>) => {
       if (!state.user?.name) {
-        state.user.name = initialState.user.user?.name
+        state.user = initialState.user
       }
 
-      state.user.name = action.payload.name
-    },
-    logout: (state) => {
-      if (!state.user?.name) {
-        state.user.name = initialState.user.user?.name
-      }
-
-      state.user.name = undefined!
-    },
-    fetchUserPending: (state) => {
-      state.fetchUsersStatus = 'pending'
-    },
-    fetchUserFailed: (state) => {
-      state.fetchUsersStatus = 'failed'
-    },
-    fetchUserSuccess: (state, action: PayloadAction<User>) => {
-      state.fetchUsersStatus = 'success'
-      state.user.name = action.payload.name
-    }
+      state.patchUserStatus = 'success'
+      state.user = action.payload
+    })
+    create.addCase(logoutUserRequest.fulfilled, (state) => {
+      state.logoutStatus = 'success'
+      state.user = undefined
+    })
+    create.addCase(getUserRequest.pending, (state) => {
+      state.fetchUserStatus = 'pending'
+    })
+    create.addCase(patchUserRequest.pending, (state) => {
+      state.patchUserStatus = 'pending'
+    })
+    create.addCase(logoutUserRequest.pending, (state) => {
+      state.logoutStatus = 'pending'
+    })
+    create.addCase(getUserRequest.rejected, (state) => {
+      state.fetchUserStatus = 'failed'
+    })
+    create.addCase(patchUserRequest.rejected, (state) => {
+      state.patchUserStatus = 'failed'
+    })
+    create.addCase(logoutUserRequest.rejected, (state) => {
+      state.logoutStatus = 'failed'
+    })
   }
 })

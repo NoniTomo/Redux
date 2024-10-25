@@ -1,18 +1,17 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
 
 import { type ListId, listsSlice } from '@/entities/list/list.slice'
 import { FormName, Menu } from '@/shared/components'
-import { useAppSelector } from '@/shared/lib/store'
+import { useAppDispatch, useAppSelector } from '@/shared/lib/store'
 
 export interface ListComponentProps {
   listId: ListId
 }
 
 export const ListComponent = ({ listId }: ListComponentProps) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const entities = useAppSelector((state) => state.lists.entities)
 
   const [isEdit, setEdit] = React.useState(false)
@@ -36,9 +35,11 @@ export const ListComponent = ({ listId }: ListComponentProps) => {
               setEdit={setEdit}
               dispatch={(name) =>
                 dispatch(
-                  listsSlice.actions.changeList({
-                    listId,
-                    name
+                  listsSlice.actions.changeLists({
+                    params: {
+                      listId,
+                      name
+                    }
                   })
                 )
               }
@@ -61,7 +62,9 @@ export const ListComponent = ({ listId }: ListComponentProps) => {
               deleteFunction={() =>
                 dispatch(
                   listsSlice.actions.deleteList({
-                    listId: listId
+                    params: {
+                      listId
+                    }
                   })
                 )
               }

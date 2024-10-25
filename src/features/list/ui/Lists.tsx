@@ -17,8 +17,9 @@ export const Lists = () => {
         dispatch={(name: string) =>
           dispatch(
             listsSlice.actions.createList({
-              id: 1,
-              name: name
+              params: {
+                name
+              }
             })
           )
         }

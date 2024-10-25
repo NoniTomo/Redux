@@ -12,4 +12,4 @@ export type PatchListIdRequestParams = {
 export type PatchListIdRequestConfig = RequestConfig<PatchListIdRequest & PatchListIdRequestParams>
 
 export const patchListId = async ({ params, config }: PatchListIdRequestConfig) =>
-  instance.patch(`/lists/${params.listId}`, params, config)
+  instance.patch<null>(`/lists/${params.listId}`, params, config)

@@ -5,7 +5,10 @@ export const postListsConfig: RestRequestConfig = {
   method: 'post',
   routes: [
     {
-      data: () => ({ id: Date.now() }),
+      data: (request) => ({
+        id: Date.now(),
+        name: request.body.name
+      }),
       entities: {
         body: {
           name: { checkMode: 'exists' }

@@ -1,15 +1,14 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSelector } from '@reduxjs/toolkit'
 
-import type { ExtraArgument } from '@/shared/lib/store'
-import { createSlice } from '@/shared/lib/store'
+import { createAppSlice } from '@/shared/lib/store'
 
-//import { initialState } from '../initialState'
 import { type List, type ListId, listsSlice } from '../list/list.slice'
 
+import { deleteTodosRequest } from './model/deleteTodos'
 import { getTodosRequest } from './model/getTodos'
-import { patchTodos } from './model/patchTodos'
-import { postTodos } from './model/postTodos'
+import { patchTodosRequest } from './model/patchTodos'
+import { postTodosRequest } from './model/postTodos'
 
 export type TodoId = number
 
@@ -38,7 +37,7 @@ const initialState: StateTodo = {
   patchTodosStatus: 'idle'
 }
 
-export const todosSlice = createSlice({
+export const todosSlice = createAppSlice({
   name: 'todos',
   initialState: initialState,
   selectors: {
@@ -46,10 +45,12 @@ export const todosSlice = createSlice({
       (state: StateTodo, listId: ListId) => state.idsByList[listId],
       (state: StateTodo) => state.entities,
       (todoIds, entities) =>
-        todoIds.map((id: number) => entities[id]).filter((todo): todo is Todo => !!todo)
+        todoIds?.map((id: number) => entities[id]).filter((todo): todo is Todo => !!todo)
     ),
     selectTodo: (state, todoId: TodoId) => state.entities[todoId],
     selectTodosIds: (state, listId) => state.idsByList[listId],
+    selectIdsByListIncludeListId: (state, listId) =>
+      state.idsByList && Object.keys(state.idsByList)?.includes(listId) ? true : false,
     selectIsFetchTodosPending: (state) => state.fetchTodosStatus === 'pending',
     selectIsFetchTodosIdle: (state) => state.fetchTodosStatus === 'idle',
     selectIsDeleteTodoPending: (state) => state.fetchTodosStatus === 'pending',
@@ -57,52 +58,40 @@ export const todosSlice = createSlice({
     selectIsPatchTodoPending: (state) => state.fetchTodosStatus === 'pending',
     selectIsPatchTodoIdle: (state) => state.fetchTodosStatus === 'idle'
   },
-  reducers: (creator) => ({
-    deleteTodo: creator.asyncThunk<
-      {
-        todoId: TodoId
-        listId: ListId
-      },
-      {
-        todoId: TodoId
-        listId: ListId
-      },
-      { extra: ExtraArgument }
-    >(
-      ({ todoId, listId }, thunkApi) => {
-        thunkApi.extra.api.deleteListsIdTodosId({
-          params: { todoId: Number(todoId), listId: Number(listId) }
-        })
-        return { todoId, listId }
-      },
-      {
-        pending: (state) => {
-          state.deleteTodoStatus = 'pending'
-        },
-        rejected: (state) => {
-          state.deleteTodoStatus = 'failed'
-        },
-        fulfilled: (state, action) => {
-          const { listId, todoId } = action.payload
-          const entities = { ...state.entities }
-          delete entities[todoId]
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(
+      deleteTodosRequest.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          todoId: TodoId
+          listId: ListId
+        }>
+      ) => {
+        const { listId, todoId } = action.payload
+        const entities = { ...state.entities }
+        delete entities[todoId]
 
-          return {
-            ...state,
-            deleteTodoStatus: 'success',
-            entities: entities,
-            idsByList: {
-              ...state.idsByList,
-              [listId]: state.idsByList[listId].filter((id: TodoId) => id !== todoId)
-            }
+        return {
+          ...state,
+          deleteTodoStatus: 'success',
+          entities: entities,
+          idsByList: {
+            ...state.idsByList,
+            [listId]: state.idsByList[listId].filter((id: TodoId) => id !== todoId)
           }
         }
       }
     )
-  }),
-  extraReducers: (builder) => {
+    builder.addCase(deleteTodosRequest.rejected, (state) => {
+      state.deleteTodoStatus = 'failed'
+    })
+    builder.addCase(deleteTodosRequest.pending, (state) => {
+      state.deleteTodoStatus = 'pending'
+    })
     builder.addCase(
-      listsSlice.actions.deleteList,
+      listsSlice.actions.deleteList.fulfilled,
       (
         state,
         action: PayloadAction<{
@@ -123,7 +112,7 @@ export const todosSlice = createSlice({
         }
       }
     )
-    builder.addCase(listsSlice.actions.createList, (state, action: PayloadAction<List>) => ({
+    builder.addCase(listsSlice.actions.createList.fulfilled, (state, action: PayloadAction<List>) => ({
       ...state,
       idsByList: {
         ...state.idsByList,
@@ -138,12 +127,21 @@ export const todosSlice = createSlice({
           entities: Record<TodoId, Todo>
           idsByList: Record<ListId, TodoId[]>
         }>
-      ) => ({
-        ...state,
-        fetchTodosStatus: 'success',
-        entities: action.payload.entities,
-        idsByList: action.payload.idsByList
-      })
+      ) => {
+        console.log(state?.entities)
+        console.log({
+          ...state,
+          fetchTodosStatus: 'success',
+          entities: { ...state?.entities, ...action.payload.entities },
+          idsByList: { ...state?.idsByList, ...action.payload.idsByList }
+        })
+        return {
+          ...state,
+          fetchTodosStatus: 'success',
+          entities: { ...state?.entities, ...action.payload.entities },
+          idsByList: { ...state?.idsByList, ...action.payload.idsByList }
+        }
+      }
     )
     builder.addCase(getTodosRequest.rejected, (state) => {
       state.fetchTodosStatus = 'failed'
@@ -152,7 +150,7 @@ export const todosSlice = createSlice({
       state.fetchTodosStatus = 'pending'
     })
     builder.addCase(
-      postTodos.fulfilled,
+      postTodosRequest.fulfilled,
       (
         state,
         action: PayloadAction<{
@@ -169,14 +167,14 @@ export const todosSlice = createSlice({
         }
       })
     )
-    builder.addCase(postTodos.rejected, (state) => {
+    builder.addCase(postTodosRequest.rejected, (state) => {
       state.postTodosStatus = 'failed'
     })
-    builder.addCase(postTodos.pending, (state) => {
+    builder.addCase(postTodosRequest.pending, (state) => {
       state.postTodosStatus = 'pending'
     })
     builder.addCase(
-      patchTodos.fulfilled,
+      patchTodosRequest.fulfilled,
       (
         state,
         action: PayloadAction<{
@@ -195,10 +193,10 @@ export const todosSlice = createSlice({
         }
       }
     )
-    builder.addCase(patchTodos.rejected, (state) => {
+    builder.addCase(patchTodosRequest.rejected, (state) => {
       state.patchTodosStatus = 'failed'
     })
-    builder.addCase(patchTodos.pending, (state) => {
+    builder.addCase(patchTodosRequest.pending, (state) => {
       state.patchTodosStatus = 'pending'
     })
   }

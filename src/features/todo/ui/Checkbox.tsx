@@ -1,4 +1,4 @@
-import { patchTodos } from '@/entities/todo/model/patchTodos'
+import { patchTodosRequest } from '@/entities/todo/model/patchTodos'
 import type { TodoId } from '@/entities/todo/todo.slice'
 import { todosSlice } from '@/entities/todo/todo.slice'
 import type { State } from '@/shared/lib/store'
@@ -21,7 +21,7 @@ export const Checkbox = ({ todoId }: CheckboxProps) => {
       checked={todo?.value}
       onChange={(event) => {
         dispatch(
-          patchTodos({
+          patchTodosRequest({
             params: {
               todo: {
                 id: todo.id,

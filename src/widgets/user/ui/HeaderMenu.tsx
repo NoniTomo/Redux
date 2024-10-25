@@ -1,15 +1,16 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { IconPencil } from '@tabler/icons-react'
+import { Link } from 'react-router-dom'
+import { IconLogout, IconPencil } from '@tabler/icons-react'
 
+import { logoutUserRequest } from '@/entities/user/model/logoutUser'
 import { userSlice } from '@/entities/user/user.slice'
-import { LogoutButton } from '@/features/user/ui/LogoutButton'
+import { ChangeModal } from '@/features/user/ui/ChangeModal'
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
   Button,
-  Modal,
   Popover,
   PopoverContent,
   PopoverTrigger
@@ -20,10 +21,11 @@ const MAX_NAME_LENGTH = 10
 
 export const HeaderMenu = () => {
   const dispatch = useAppDispatch()
-  const username = useSelector(userSlice.selectors.selectUserName)
+  const user = useSelector(userSlice.selectors.selectUser)
   const [isOpenMenu, setOpenMenu] = React.useState(false)
   const [isOpenModal, setOpenModal] = React.useState(false)
-  const [name, setName] = React.useState(username)
+
+  if (!user?.name) return <span className="text-white">Login</span>
 
   return (
     <>
@@ -39,9 +41,9 @@ export const HeaderMenu = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <span className="text-white">
-              {username.length > MAX_NAME_LENGTH
-                ? username.slice(0, MAX_NAME_LENGTH - 3) + '...'
-                : username}
+              {user.name.length > MAX_NAME_LENGTH
+                ? user.name.slice(0, MAX_NAME_LENGTH - 3) + '...'
+                : user.name}
             </span>
           </Button>
         </PopoverTrigger>
@@ -58,24 +60,21 @@ export const HeaderMenu = () => {
               <IconPencil className="size-5" />
               <span>Изменить</span>
             </Button>
-            <LogoutButton />
+            <Button
+              variant="destructive"
+              onClick={() => dispatch(logoutUserRequest({}))}
+              className="p-2"
+              asChild
+            >
+              <Link to="/auth">
+                <IconLogout className="size-5" />
+                <span className="text-white">Выйти</span>
+              </Link>
+            </Button>
           </div>
         </PopoverContent>
       </Popover>
-      <Modal open={() => setOpenModal(!isOpenModal)} isOpen={isOpenModal}>
-        <h5>Введеите новое имя:</h5>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            dispatch(userSlice.actions.updateUsername({ name }))
-            setOpenModal(false)
-          }}
-        >
-          <label>Имя</label>
-          <input value={name} name="name" onChange={(event) => setName(event.target.value)} />
-          <Button type="submit">Изменить</Button>
-        </form>
-      </Modal>
+      <ChangeModal isOpenModal={isOpenModal} setOpenModal={setOpenModal} />
     </>
   )
 }

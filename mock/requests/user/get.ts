@@ -10,3 +10,13 @@ export const getUserConfig: RestRequestConfig = {
     }
   ]
 }
+
+export const getLogoutUserConfig: RestRequestConfig = {
+  path: '/logout',
+  method: 'get',
+  routes: [
+    {
+      data: null
+    }
+  ]
+}

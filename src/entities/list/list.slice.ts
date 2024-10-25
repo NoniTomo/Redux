@@ -1,8 +1,13 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 
-import { createSlice } from '@/shared/lib/store'
-
-import { getListsRequest } from './model/getLists'
+import type {
+  DeleteListIdRequestConfig,
+  GetListsRequestConfig,
+  PatchListIdRequestConfig,
+  PostListsRequestConfig
+} from '@/shared/api/requests'
+import type { AppState, ExtraArgument } from '@/shared/lib/store'
+import { createAppSlice } from '@/shared/lib/store'
 
 export type ListId = number
 
@@ -11,19 +16,25 @@ export interface List {
   name: string
 }
 
-const initialState: StateLists = {
-  entities: {},
-  ids: [],
-  fetchListsStatus: 'idle'
-}
-
 export interface StateLists {
   entities: Record<ListId, List>
   ids: ListId[]
   fetchListsStatus: 'idle' | 'pending' | 'success' | 'failed'
+  postListsStatus: 'idle' | 'pending' | 'success' | 'failed'
+  deleteListsStatus: 'idle' | 'pending' | 'success' | 'failed'
+  patchListsStatus: 'idle' | 'pending' | 'success' | 'failed'
 }
 
-export const listsSlice = createSlice({
+const initialState: StateLists = {
+  entities: {},
+  ids: [],
+  fetchListsStatus: 'idle',
+  postListsStatus: 'idle',
+  deleteListsStatus: 'idle',
+  patchListsStatus: 'idle'
+}
+
+export const listsSlice = createAppSlice({
   name: 'lists',
   initialState: initialState,
   selectors: {
@@ -31,67 +42,143 @@ export const listsSlice = createSlice({
     selectIsFetchListsIdle: (state) => state.fetchListsStatus === 'idle',
     selectIsListsIds: (state) => state.ids
   },
-  reducers: {
-    createList: (state, action: PayloadAction<List>) => ({
-      ...state,
-      entities: { ...state.entities, [action.payload.id]: action.payload },
-      ids: [action.payload.id, ...state.ids]
-    }),
-    deleteList: (
-      state,
-      action: PayloadAction<{
-        listId: ListId
-      }>
-    ) => {
-      const listId = action.payload.listId
-      const entities = { ...state.entities }
-      delete entities[listId]
+  reducers: (creator) => ({
+    getLists: creator.asyncThunk<
+      {
+        entities: Record<ListId, List>
+        ids: ListId[]
+      },
+      GetListsRequestConfig & { refetch?: boolean },
+      { extra: ExtraArgument }
+    >(
+      async (params: GetListsRequestConfig, thunkApi) =>
+        await thunkApi.extra.api.getLists(params).then((res) => ({
+          entities: res.data.items.reduce(
+            (entities, list) => {
+              entities[list.id] = list
+              return entities
+            },
+            {} as Record<ListId, List>
+          ),
+          ids: res.data.items.map((list) => list.id)
+        })),
+      {
+        options: {
+          condition: (arg, { getState }) => {
+            const isIdle = listsSlice.selectors.selectIsFetchListsIdle(getState() as AppState)
 
-      return {
-        ...state,
-        entities: entities,
-        ids: state.ids.filter((id: ListId) => id !== listId)
+            if (!isIdle && !arg.refetch) return false
+
+            return true
+          }
+        },
+        pending: (state) => {
+          state.fetchListsStatus = 'pending'
+        },
+        rejected: (state) => {
+          state.fetchListsStatus = 'failed'
+        },
+        fulfilled: (
+          state,
+          action: PayloadAction<{
+            entities: Record<ListId, List>
+            ids: ListId[]
+          }>
+        ) => ({
+          ...state,
+          fetchListsStatus: 'success',
+          entities: action.payload.entities,
+          ids: action.payload.ids
+        })
       }
-    },
-    changeList: (
-      state,
-      action: PayloadAction<{
-        listId: ListId
-        name: string
-      }>
-    ) => {
-      const { name, listId } = action.payload
-
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          [listId]: { ...state.entities[listId], name }
+    ),
+    createList: creator.asyncThunk<List, PostListsRequestConfig, { extra: ExtraArgument }>(
+      async ({ params, config }: PostListsRequestConfig, thunkApi) =>
+        (await thunkApi.extra.api.postLists({ params, config })).data.list,
+      {
+        fulfilled: (state, action: PayloadAction<List>) => ({
+          ...state,
+          postListsStatus: 'success',
+          entities: { ...state.entities, [action.payload.id]: action.payload },
+          ids: [action.payload.id, ...state.ids]
+        }),
+        rejected: (state) => {
+          state.postListsStatus = 'failed'
+        },
+        pending: (state) => {
+          state.postListsStatus = 'pending'
         }
       }
-    }
-  },
-  extraReducers: (builder) => {
-    builder.addCase(getListsRequest.pending, (state) => {
-      state.fetchListsStatus = 'pending'
-    })
-    builder.addCase(getListsRequest.rejected, (state) => {
-      state.fetchListsStatus = 'failed'
-    })
-    builder.addCase(
-      getListsRequest.fulfilled,
-      (
-        state,
-        action: PayloadAction<{
-          entities: Record<ListId, List>
-          ids: ListId[]
-        }>
-      ) => ({
-        ...state,
-        fetchListsStatus: 'success',
-        entities: action.payload.entities,
-        ids: action.payload.ids
-      })
+    ),
+    deleteList: creator.asyncThunk<
+      { listId: ListId },
+      DeleteListIdRequestConfig,
+      { extra: ExtraArgument }
+    >(
+      async ({ params, config }: DeleteListIdRequestConfig, thunkApi) => {
+        await thunkApi.extra.api.deleteListId({ params, config })
+
+        thunkApi.extra.router.navigate('/')
+
+        return { listId: params.listId }
+      },
+      {
+        fulfilled: (
+          state,
+          action: PayloadAction<{
+            listId: ListId
+          }>
+        ) => {
+          const listId = action.payload.listId
+          const entities = { ...state.entities }
+          delete entities[listId]
+
+          return {
+            ...state,
+            deleteListsStatus: 'success',
+            entities: entities,
+            ids: state.ids.filter((id: ListId) => id !== listId)
+          }
+        },
+        rejected: (state) => {
+          state.deleteListsStatus = 'failed'
+        },
+        pending: (state) => {
+          state.deleteListsStatus = 'pending'
+        }
+      }
+    ),
+    changeLists: creator.asyncThunk<
+      {
+        listId: ListId
+        name: string
+      },
+      PatchListIdRequestConfig,
+      { extra: ExtraArgument }
+    >(
+      async (params: PatchListIdRequestConfig, thunkApi) => {
+        await thunkApi.extra.api.patchListId(params)
+        return params.params
+      },
+      {
+        fulfilled: (state, action) => {
+          const { name, listId } = action.payload
+
+          return {
+            ...state,
+            entities: {
+              ...state.entities,
+              [listId]: { ...state.entities[listId], name }
+            }
+          }
+        },
+        rejected: (state) => {
+          state.patchListsStatus = 'failed'
+        },
+        pending: (state) => {
+          state.patchListsStatus = 'pending'
+        }
+      }
     )
-  }
+  })
 })

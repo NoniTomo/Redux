@@ -2,7 +2,8 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
-import { patchTodos } from '@/entities/todo/model/patchTodos'
+import { deleteTodosRequest } from '@/entities/todo/model/deleteTodos'
+import { patchTodosRequest } from '@/entities/todo/model/patchTodos'
 import type { Todo, TodoId } from '@/entities/todo/todo.slice'
 import { todosSlice } from '@/entities/todo/todo.slice'
 import { FormName } from '@/shared/components/FormName'
@@ -27,7 +28,7 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
 
   const onChangeTodo = ({ name, value }: Partial<Todo>) =>
     dispatch(
-      patchTodos({
+      patchTodosRequest({
         params: {
           todo: {
             ...todo,
@@ -55,7 +56,7 @@ export const TodoComponent = ({ todoId, ...props }: TodoProps) => {
       <Menu
         editFunction={() => setEdit(true)}
         deleteFunction={() =>
-          dispatch(todosSlice.actions.deleteTodo({ listId: Number(params.listId), todoId: todo.id }))
+          dispatch(deleteTodosRequest({ params: { listId: Number(params.listId), todoId: todo.id } }))
         }
         isDeletePending={isDeletePending}
       />

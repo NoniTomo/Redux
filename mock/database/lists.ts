@@ -1,4 +1,6 @@
-export const LISTS = {
+import type { List } from '@/shared/api/requests'
+
+export const LISTS: { items: List[] } = {
   items: [
     { id: 1, name: 'Grocery Shopping' },
     { id: 2, name: 'Work Tasks' },

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 
-import { postTodos } from '@/entities/todo/model/postTodos'
+import { postTodosRequest } from '@/entities/todo/model/postTodos'
 import { todosSlice } from '@/entities/todo/todo.slice'
 import { AddButton } from '@/shared/components'
 import { useAppDispatch, useAppSelector } from '@/shared/lib/store'
@@ -20,7 +20,7 @@ export const TodoList = () => {
       <AddButton
         dispatch={(name) =>
           dispatch(
-            postTodos({
+            postTodosRequest({
               params: {
                 listId: Number(params.listId),
                 name: name

@@ -1,5 +1,3 @@
 type UserResponse = {
-  user: {
-    name: string
-  }
+  name: string
 }

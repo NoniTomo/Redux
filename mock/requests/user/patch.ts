@@ -5,15 +5,10 @@ export const patchUserConfig: RestRequestConfig = {
   method: 'patch',
   routes: [
     {
-      data: [],
+      data: (request) => request.body,
       entities: {
         body: {
-          'user.name': { checkMode: 'exists' }
-        }
-      },
-      interceptors: {
-        request: (request) => {
-          return request.request.body
+          name: { checkMode: 'exists' }
         }
       }
     }
